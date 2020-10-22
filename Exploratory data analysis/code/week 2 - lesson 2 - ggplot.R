@@ -79,18 +79,63 @@ ggplot(maacs, aes(logpm25, NocturnalSympt)) +
   # assigning the color to be the value of a variable, according to the group
   geom_point(aes(color = bmicat), size = 4, alpha = 1/2)
 
-
 # modify labels
 ggplot(maacs, aes(logpm25, NocturnalSympt)) + 
   geom_point(aes(color = bmicat)) +
   labs(title = "MAACS Cohort") +
   labs(x = expression("log " * PM[2.5]), y = "Nocturnal Symptoms")
 
+# customizing the smooth
+ggplot(maacs, aes(logpm25, NocturnalSympt)) + 
+  geom_point(aes(color = bmicat), size = 2, alpha = 1/2) +
+  geom_smooth(size = 4, linetype = 3, method = 'lm', se = FALSE) # se = FALSE => no confidence intervals
 
+# change the theme
+ggplot(maacs, aes(logpm25, NocturnalSympt)) + 
+  geom_point(aes(color = bmicat), size = 2, alpha = 1/2) +
+  theme_bw(base_family = "Times")
 
+# --------------------------------------------------------------------------------
 
+# about axis limits
+testdat <- data.frame(x = 1:100, y = rnorm(100))
+testdat[50, 2] <- 100 # as the outliers
+plot(testdat$x, testdat$y, type = "l", ylim = c(-3,3))
 
+# 1.
+ggplot(testdat, aes(x = x, y = y)) +
+  geom_line() +
+  coord_cartesian(ylim = c(-3,3)) # outlier included but plot limited by scale
 
+# 2.
+ggplot(testdat, aes(x = x, y = y)) +
+  geom_line() +
+  ylim(c(-3,3)) # outlier missing as data set is filterd by scale first and then plot the grapth
+
+# --------------------------------------------------------------------------------
+
+# complicated example
+# 1. making NO2 Tertiles  (0-33%, 33%-66%, 66%-100%)
+## calculate the deciles of the data 
+cutpoints <- quantile(maacs$logno2_new, seq(0, 1, length = 4), na.rm = TRUE)
+## cut the data at the deciles and create a new factor variable
+maacs$no2dec <- cut(maacs$logno2_new, cutpoints) # cut divides the range of x into intervals, return factor
+## see the levels of the newly created factor variable
+levels(maacs$no2dec)
+
+## plot
+## set up ggplot with data frame
+g <- ggplot(maacs, aes(x = logpm25, y = NocturnalSympt))
+
+## add layers
+g + 
+  geom_point(alpha = 1/3) +                                   # add points
+  facet_wrap(bmicat~no2dec, nrow = 2, ncol = 4) +             # add panels
+  geom_smooth(method = 'lm', se = FALSE, col = "steelblue") + # add smoother 
+  theme_bw(base_family = "Avenir", base_size = 10) +          # change theme
+  labs(x = expression("long" * PM[2.5])) +                    # add labels
+  labs(y = "Nocturnal Symptoms") +
+  labs(title = "MAACS Cohort")
 
 
 
