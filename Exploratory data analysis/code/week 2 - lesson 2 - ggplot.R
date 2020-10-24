@@ -137,6 +137,25 @@ g +
   labs(y = "Nocturnal Symptoms") +
   labs(title = "MAACS Cohort")
 
+# ------ quiz -------
+library(nlme)
+library(lattice)
+xyplot(weight ~ Time | Diet, BodyWeight)
+
+
+library(datasets)
+data(airquality)
+# the relationship between ozone and wind speed varies across each month
+airquality = transform(airquality, Month = factor(Month))
+qplot(Wind, Ozone, data = airquality, facets = . ~ Month)
+
+
+# library(ggplot2)
+library(ggplot2movies)
+g <- ggplot(movies, aes(votes, rating))
+print(g)
+
+qplot(votes, rating, data = movies) + geom_smooth()
 
 
 
